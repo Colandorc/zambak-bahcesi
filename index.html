@@ -3,8 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
-<title>Zambak Bahçesi</title>
+<title>emrullahaydogdu design</title>
 <meta name="theme-color" content="#000000"/>
+<meta property="og:title" content="emrullahaydogdu design">
+<meta name="twitter:title" content="emrullahaydogdu design">
 <style>
   :root{ --fg:#eef2ff; }
 
@@ -23,7 +25,7 @@
     background:#000;
   }
 
-  /* ışıltılar (çok hafif) */
+  /* hafif parıltılar */
   .spark{
     position:fixed; left:0; top:0; width:4px; height:4px; border-radius:50%;
     background: radial-gradient(circle, #fff, rgba(255,255,255,0) 70%);
@@ -32,8 +34,8 @@
   }
   @keyframes sparkFloat{
     0%   { transform: translate(var(--x), 105vh) scale(var(--s)); opacity:0 }
-    10%  { opacity:.65 }
-    90%  { opacity:.65 }
+    10%  { opacity:.6 }
+    90%  { opacity:.6 }
     100% { transform: translate(calc(var(--x) + var(--dx)), -10vh) scale(var(--s)); opacity:0 }
   }
 
@@ -53,7 +55,7 @@
     100% {opacity:0; transform: translateY(-10px) scale(.98)}
   }
 
-  /* sağ alttaki imza */
+  /* imza */
   .credit{
     position:fixed; right:14px; bottom:12px; z-index:3;
     font-size:12.5px; opacity:.9;
@@ -61,7 +63,7 @@
     border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(6px);
   }
 
-  /* başlangıç kapağı – tek tık */
+  /* tek tık kapağı */
   .overlay{
     position:fixed; inset:0; display:grid; place-items:center; z-index:5;
     background:linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.30));
@@ -91,20 +93,20 @@
   <!-- müzik -->
   <audio id="bgm" src="m%C3%BCzik.mp3" loop preload="auto"></audio>
 
-  <!-- ışıltılar üretilecek -->
+  <!-- parıltılar -->
   <div id="sparkLayer"></div>
 
-  <!-- mesaj döngüsü alanı -->
+  <!-- mesaj alanı -->
   <div class="stack"><div id="msg" class="msg"></div></div>
 
   <!-- imza -->
   <div class="credit">emrullahaydogdu design</div>
 
-  <!-- tek seferlik dokun/başlat -->
+  <!-- tek tıkla başlat -->
   <div class="overlay" id="overlay"><div class="tap" id="tapBtn">Buraya tıkla</div></div>
 
 <script>
-/* ========== hafif ışıltılar ========== */
+/* ====== hafif ışıltılar ====== */
 const sparkLayer = document.getElementById('sparkLayer');
 function spawnSpark(){
   const s = document.createElement('div');
@@ -116,14 +118,17 @@ function spawnSpark(){
   sparkLayer.appendChild(s);
   s.addEventListener('animationend', ()=> s.remove());
 }
-// çok hafif yoğunluk
 setInterval(()=>{ if(!document.hidden) spawnSpark(); }, 900);
 
-/* ========== mesaj döngüsü ========== */
+/* ====== mesaj döngüsü (doğal, özgün metinlerle) ====== */
 const msg = document.getElementById('msg');
 const messages = [
   { text: "Her zaman yanında olacağım.", dur: 5000 },
-  { text: "Sen bir gün zambakları sevmeyi bırakırsan; işte o gün ben de seni sevmeyi bırakırım.", dur: 8000 }
+  { text: "Sen bir gün zambakları sevmeyi bırakırsan; işte o gün ben de seni sevmeyi bırakırım.", dur: 8000 },
+  { text: "Belki bir gün beni unutabilirsin, ama senin için yaptıklarımı...", dur: 7000 },
+  { text: "Sana hissettirdiklerimi ve hissettireceklerimi unutmazsın.", dur: 7000 },
+  { text: "Sessizliğinde bile seni duyan bir kalp var.", dur: 6000 },
+  { text: "Zaman geçse de, bazı duygular hep aynı kalır.", dur: 6000 }
 ];
 let idx = 0, loopStarted = false;
 function rotateMessages(){
@@ -134,15 +139,15 @@ function rotateMessages(){
   idx++; setTimeout(rotateMessages, m.dur);
 }
 
-/* ========== tek tıkla başlat ========== */
+/* ====== tek tıkla başlat ====== */
 const audio = document.getElementById('bgm');
 const overlay = document.getElementById('overlay');
 const tapBtn  = document.getElementById('tapBtn');
 
 async function startAll(){
-  overlay.style.display = 'none';        // kapağı kaldır
+  overlay.style.display = 'none';
   if(!loopStarted){ loopStarted = true; rotateMessages(); }
-  try{ await audio.play(); }catch(_){/* bazı tarayıcılar sessiz bırakabilir */ }
+  try{ await audio.play(); }catch(_){}
 }
 tapBtn.addEventListener('click', startAll);
 window.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') startAll(); });
