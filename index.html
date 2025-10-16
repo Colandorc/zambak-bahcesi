@@ -139,7 +139,7 @@ function rotateMessages(){
   idx++; setTimeout(rotateMessages, m.dur);
 }
 
-/* ====== tek tıkla başlat + müzik 10. saniyeden ====== */
+/* ====== tek tıkla başlat + müzik 17. saniyeden ====== */
 const audio = document.getElementById('bgm');
 const overlay = document.getElementById('overlay');
 const tapBtn  = document.getElementById('tapBtn');
@@ -149,11 +149,11 @@ async function startAll(){
   if(!loopStarted){ loopStarted = true; rotateMessages(); }
 
   try {
-    audio.currentTime = 10;           // 🎵 müzik 10. saniyeden başlasın
+    audio.currentTime = 17;           // 🎵 müzik 17. saniyeden başlasın
     await audio.play();
     // bazı tarayıcılar hemen atlamaz, 300ms sonra tekrar zorluyoruz
     setTimeout(() => { 
-      try { audio.currentTime = 10; } catch(e){} 
+      try { audio.currentTime = 17; } catch(e){} 
     }, 300);
   } catch(_){}
 }
