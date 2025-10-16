@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Zambak Bahçesi</title>
+<style>
+  :root{
+    --bg: radial-gradient(1200px 800px at 70% 10%, #1a1b2e 0%, #0e0f1a 50%, #0b0c14 100%);
+  }
+  html,body{height:100%;margin:0}
+  body{
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    background: var(--bg);
+    overflow:hidden;
+    color:#e8ecff;
+  }
+  header{
+    position:fixed; inset: 20px auto auto 20px; z-index:3;
+    padding:10px 14px; border-radius:14px; backdrop-filter: blur(8px);
+    background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  header h1{font-size:18px; margin:0 0 4px}
+  header p{margin:0; font-size:13px; opacity:.85}
+  .stage{position:relative; width:100%; height:100%;}
+  .lily{
+    position:absolute; width:160px; height:160px; transform-origin:center;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,.35));
+    animation: floatY var(--dur) linear forwards;
+    opacity:0;
+  }
+  .glow{
+    filter: url(#glow);
+  }
+  .breathe{ animation: breathe 6s ease-in-out infinite; transform-origin:center }
+  .lily:hover .group{ animation: wobble .9s ease-in-out infinite alternate; }
+  @keyframes floatY{
+    0%   { transform: translate(var(--x), 110vh) scale(var(--scale)) rotate(0deg); opacity:0}
+    6%   { opacity:.95 }
+    94%  { opacity:.95 }
+    100% { transform: translate(calc(var(--x) + var(--drift)), -20vh) scale(var(--scale)) rotate(360deg); opacity:0}
+  }
+  @keyframes breathe{
+    0%,100%{ transform: scale(1)}
+    50%{ transform: scale(1.05)}
+  }
+  @keyframes wobble{
+    from{ transform: rotate(-2deg) }
+    to  { transform: rotate(2deg) }
+  }
+  .floor{
+    position:fixed; left:0; right:0; bottom:-40px; height:160px; z-index:0;
+    background: radial-gradient(60% 100% at 50% 0%, rgba(99,132,255,.17), rgba(0,0,0,0) 70%);
+    pointer-events:none;
+  }
+  .credits{
+    position:fixed; right:16px; bottom:12px; font-size:12px; opacity:.65
+  }
+  a{color:#a7b8ff; text-decoration:none}
+  a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+  <header>
+    <h1>🌸 Zambak Bahçesi</h1>
+    <p>Ekrana tıklarsan daha fazla zambak açar.</p>
+  </header>
+
+  <div class="stage" id="stage" aria-label="Zambak animasyonu"></div>
+  <div class="floor"></div>
+  <div class="credits">made with ♥ — <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub Pages</a></div>
+
+<script>
+const stage = document.getElementById('stage');
+
+const palettes = [
+  ['#ffd1e8','#ff9ad5','#f770b6','#b858ff'],
+  ['#b8f1ff','#7dd3fc','#60a5fa','#a78bfa'],
+  ['#fef9c3','#fde68a','#fca5a5','#f472b6'],
+  ['#c7f9cc','#80ed99','#57cc99','#38a3a5']
+];
+
+function rand(min,max){ return Math.random()*(max-min)+min }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+function createLily(){
+  const lily = document.createElement('div');
+  lily.className = 'lily';
+  const scale = rand(.6, 1.2).toFixed(2);
+  lily.style.setProperty('--scale', scale);
+  lily.style.setProperty('--x', `${rand(-10, 95).toFixed(2)}vw`);
+  lily.style.setProperty('--drift', `${rand(-12,12).toFixed(2)}vw`);
+  lily.style.setProperty('--dur', `${rand(18, 32).toFixed(2)}s`);
+
+  const pal = pick(palettes);
+  const c1 = pick(pal), c2 = pick(pal), c3 = pick(pal);
+
+  lily.innerHTML = `
+  <svg class="glow" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+    <defs>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="3" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <radialGradient id="petalGrad" cx="50%" cy="30%">
+        <stop offset="0%" stop-color="${c1}" stop-opacity="1"/>
+        <stop offset="100%" stop-color="${c2}" stop-opacity=".85"/>
+      </radialGradient>
+      <linearGradient id="coreGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="${c3}"/>
+        <stop offset="100%" stop-color="${c2}"/>
+      </linearGradient>
+    </defs>
+    <g class="group breathe">
+      ${Array.from({length:6}).map((_,i)=>{
+        const angle = i*60;
+        return `<g transform="translate(100,100) rotate(${angle})">
+          <path d="M0,0 C 8,-40 22,-72 0,-92 C -22,-72 -8,-40 0,0 Z"
+                fill="url(#petalGrad)" opacity=".95"/>
+        </g>`;
+      }).join('')}
+      <circle cx="100" cy="100" r="12" fill="url(#coreGrad)"/>
+      ${Array.from({length:6}).map((_,i)=>{
+        const angle = i*60 + 30;
+        const x = 100 + 18*Math.cos(angle*Math.PI/180);
+        const y = 100 + 18*Math.sin(angle*Math.PI/180);
+        return `<circle cx="${x}" cy="${y}" r="3.2" fill="${c3}" opacity=".9"/>`;
+      }).join('')}
+    </g>
+  </svg>`;
+  lily.addEventListener('animationend', ()=> lily.remove());
+  stage.appendChild(lily);
+}
+
+for(let i=0;i<12;i++){ setTimeout(createLily, i*350) }
+setInterval(()=>{ if(document.hidden) return; createLily(); }, 1600);
+window.addEventListener('pointerdown', ()=>{
+  for(let i=0;i<3;i++) setTimeout(createLily, i*120);
+});
+</script>
+</body>
+</html>
