@@ -3,24 +3,20 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Zambak Bahçesi</title>
+<title>Zambak Bahçesi — Gerçekçi</title>
 <style>
-  :root{
-    --bg: radial-gradient(1200px 800px at 70% 10%, #1a1b2e 0%, #0e0f1a 50%, #0b0c14 100%);
-    --textGlow: 0 6px 28px rgba(255,220,250,.35);
-    --accent: #ffd1e8;
-  }
+  :root{ --bg: radial-gradient(1200px 800px at 70% 10%, #111527 0%, #0b0d16 55%, #07080e 100%); }
   html,body{height:100%;margin:0}
   body{
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
     background: var(--bg);
-    overflow:hidden;
     color:#e8ecff;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    overflow:hidden;
   }
 
-  /* Üst mini panel */
+  /* Üst bilgi ve müzik düğmesi */
   header{
-    position:fixed; inset: 14px auto auto 14px; z-index:4;
+    position:fixed; left:14px; top:14px; z-index:5;
     padding:10px 14px; border-radius:14px; backdrop-filter: blur(8px);
     background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
     box-shadow: 0 10px 30px rgba(0,0,0,.35);
@@ -28,250 +24,208 @@
   header h1{font-size:18px; margin:0 0 4px}
   header p{margin:0; font-size:13px; opacity:.85}
 
+  .audio-toggle{
+    position:fixed; right:16px; top:16px; z-index:6;
+    display:flex; align-items:center; gap:8px;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    padding:10px 12px; border-radius:12px; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    user-select:none;
+  }
+  .audio-dot{ width:8px; height:8px; border-radius:50%; background:#f87171 }
+  .audio-toggle.playing .audio-dot{ background:#34d399 }
+
   /* Sahne */
-  .stage{position:relative; width:100%; height:100%;}
-  .lily{
-    position:absolute; width:160px; height:160px; transform-origin:center;
-    filter: drop-shadow(0 8px 20px rgba(0,0,0,.35));
-    animation: floatY var(--dur) linear forwards;
-    opacity:0;
-  }
-  .glow{ filter:url(#glow) }
-  .breathe{ animation: breathe 6s ease-in-out infinite; transform-origin:center }
-  .lily:hover .group{ animation: wobble .9s ease-in-out infinite alternate; }
-
-  @keyframes floatY{
-    0%   { transform: translate(var(--x), 110vh) scale(var(--scale)) rotate(0deg); opacity:0}
-    6%   { opacity:.95 }
-    94%  { opacity:.95 }
-    100% { transform: translate(calc(var(--x) + var(--drift)), -20vh) scale(var(--scale)) rotate(360deg); opacity:0}
-  }
-  @keyframes breathe{
-    0%,100%{ transform: scale(1)}
-    50%{ transform: scale(1.05)}
-  }
-  @keyframes wobble{ from{transform:rotate(-2deg)} to{transform:rotate(2deg)} }
-
-  /* Altta ışık */
+  .stage{ position:relative; width:100%; height:100%; }
   .floor{
     position:fixed; left:0; right:0; bottom:-40px; height:160px; z-index:0;
     background: radial-gradient(60% 100% at 50% 0%, rgba(99,132,255,.17), rgba(0,0,0,0) 70%);
     pointer-events:none;
   }
 
-  /* Ortadaki mesajlar */
-  .message{
-    position:fixed; inset:0; display:grid; place-items:center; z-index:3; pointer-events:none;
+  /* Gerçekçi zambak (görsel) */
+  .lily{
+    position:absolute; width:220px; height:auto; will-change: transform, opacity;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,.5)) saturate(1.05);
+    opacity:0;           /* yumuşak giriş/çıkış */
+    transition: opacity .8s ease;
+    transform-origin:center;
+    pointer-events:none;
+    image-rendering: auto;
   }
+  .lily.ready{ opacity:.98 }
+
+  /* Ortadaki yazılar */
+  .message{ position:fixed; inset:0; display:grid; place-items:center; z-index:4; pointer-events:none; }
   .message .text{
-    font-weight:700;
-    text-align:center;
-    line-height:1.25;
-    letter-spacing:.3px;
-    text-shadow: var(--textGlow);
-    max-width:min(90vw, 900px);
-    padding:0 18px;
-    opacity:0;
-    transform: translateY(6px) scale(.98);
+    text-align:center; font-weight:700; line-height:1.25; letter-spacing:.3px;
+    max-width:min(90vw, 900px); padding:0 18px;
+    text-shadow: 0 6px 28px rgba(255,220,250,.35);
+    opacity:0; transform: translateY(6px) scale(.98);
     animation: fadeMsg var(--msgDur,6s) ease-in-out forwards;
   }
   @keyframes fadeMsg{
-    0%   {opacity:0; transform: translateY(8px) scale(.98)}
-    10%  {opacity:1; transform: translateY(0)   scale(1)}
-    90%  {opacity:1; transform: translateY(0)   scale(1)}
-    100% {opacity:0; transform: translateY(-8px) scale(.98)}
+    0%{opacity:0; transform: translateY(8px) scale(.98)}
+    10%{opacity:1; transform: translateY(0) scale(1)}
+    90%{opacity:1}
+    100%{opacity:0; transform: translateY(-8px) scale(.98)}
   }
+  @media (max-width:720px){ .message .text{font-size:22px} header{display:none} }
+  @media (min-width:721px){ .message .text{font-size:34px} }
 
-  /* Alt sağ imza */
+  /* Sağ alttaki imza */
   .credit{
-    position:fixed; right:16px; bottom:14px; z-index:4;
-    font-size:12.5px; letter-spacing:.6px; opacity:.8;
+    position:fixed; right:16px; bottom:14px; z-index:4; opacity:.85;
+    font-size:12.5px; letter-spacing:.6px;
     background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
     padding:6px 10px; border-radius:10px; box-shadow: 0 8px 24px rgba(0,0,0,.35);
   }
 
-  /* Müzik butonu */
-  .audio-toggle{
-    position:fixed; right:16px; top:16px; z-index:5;
-    background: rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.12);
-    padding:10px 12px; border-radius:12px; cursor:pointer;
-    user-select:none; -webkit-user-select:none;
-    display:flex; gap:8px; align-items:center;
-    box-shadow: 0 10px 30px rgba(0,0,0,.35);
-  }
-  .audio-toggle span{font-size:13px; opacity:.85}
-  .audio-dot{ width:8px; height:8px; border-radius:999px; background:#f87171;}
-  .audio-toggle.playing .audio-dot{ background:#34d399 }
-
-  /* Ekstra: minik parıltılar */
+  /* Ufak parıltılar */
   .spark{
     position:absolute; width:4px; height:4px; border-radius:50%;
     background: radial-gradient(circle, #fff, rgba(255,255,255,0) 70%);
-    opacity:0; pointer-events:none; z-index:2;
-    animation: sparkFloat 5s linear forwards;
-    filter: blur(.2px);
-  }
-  @keyframes sparkFloat{
-    0%{ transform: translateY(20vh) translateX(0); opacity:0 }
-    10%{ opacity:.8 }
-    90%{ opacity:.8 }
-    100%{ transform: translateY(-25vh) translateX(12vw); opacity:0 }
-  }
-
-  /* Responsive metin boyutu */
-  @media (max-width: 720px){
-    .message .text{ font-size: 22px }
-    header{ display:none }
-  }
-  @media (min-width: 721px){
-    .message .text{ font-size: 34px }
+    opacity:0; pointer-events:none; z-index:2; filter: blur(.2px);
   }
 </style>
 </head>
 <body>
-  <div class="audio-toggle" id="audioBtn" title="Müzik Aç/Kapat">
-    <div class="audio-dot"></div><span>müzik</span>
-  </div>
-
-  <header>
-    <h1>🌸 Zambak Bahçesi</h1>
-    <p>Ekrana tıkla: daha çok zambak ve müzik başlar.</p>
-  </header>
+  <div class="audio-toggle" id="audioBtn"><div class="audio-dot"></div><span>müzik</span></div>
+  <header><h1>🌸 Zambak Bahçesi</h1><p>Ekrana tıkla: daha çok zambak ve müzik.</p></header>
 
   <div class="stage" id="stage" aria-label="Zambak animasyonu"></div>
   <div class="floor"></div>
 
-  <!-- Döngülü mesaj katmanı -->
   <div class="message"><div id="msg" class="text"></div></div>
-
-  <!-- Alt sağ imza -->
   <div class="credit">emrullahaydogdu design</div>
 
-  <!-- Müzik (kendi mp3’ünü repo köküne music.mp3 adıyla yükle) -->
+  <!-- Müzik dosyanı repoya music.mp3 olarak yükle -->
   <audio id="bgm" src="music.mp3" loop preload="auto"></audio>
 
 <script>
-/* ======== Animasyon renkleri ve yardımcılar ======== */
-const stage = document.getElementById('stage');
-const palettes = [
-  ['#ffd1e8','#ff9ad5','#f770b6','#b858ff'],
-  ['#b8f1ff','#7dd3fc','#60a5fa','#a78bfa'],
-  ['#fef9c3','#fde68a','#fca5a5','#f472b6'],
-  ['#c7f9cc','#80ed99','#57cc99','#38a3a5']
+/* ------------------ KULLANICI İÇİN ÖNEMLİ ------------------
+   1) Repo kökünde 'img' klasörü aç.
+   2) Şeffaf arkaplanlı gerçek zambak PNG'lerini buraya koy (200–600px).
+   3) Aşağıdaki listeye dosya adlarını yaz.
+-------------------------------------------------------------- */
+const lilyImages = [
+  'img/lily_white.png',
+  'img/lily_pink.png',
+  'img/lily_orange.png',
+  'img/lily_purple.png'
 ];
-const rand=(a,b)=>Math.random()*(b-a)+a;
-const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+// (Elinde kaç görsel varsa diziye ekleyebilirsin. Yoksa 2–3 farklı PNG yeter.)
 
-/* ======== Zambak (SVG) üretimi ======== */
-function createLily(){
-  const lily = document.createElement('div');
-  lily.className = 'lily';
-  lily.style.setProperty('--scale', rand(.6, 1.2).toFixed(2));
-  lily.style.setProperty('--x', `${rand(-10, 95).toFixed(2)}vw`);
-  lily.style.setProperty('--drift', `${rand(-12,12).toFixed(2)}vw`);
-  lily.style.setProperty('--dur', `${rand(18, 32).toFixed(2)}s`);
+const stage = document.getElementById('stage');
+const lilies = new Set();
 
-  const pal = pick(palettes);
-  const c1 = pick(pal), c2 = pick(pal), c3 = pick(pal);
+/* --------- Gerçekçi hareket: rüzgârla salınan sinüs yolu --------- */
+function createRealLily(){
+  if(!lilyImages.length) return;
 
-  lily.innerHTML = `
-  <svg class="glow" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
-    <defs>
-      <filter id="glow">
-        <feGaussianBlur stdDeviation="3" result="b"/>
-        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-      <radialGradient id="petalGrad" cx="50%" cy="30%">
-        <stop offset="0%" stop-color="${c1}" stop-opacity="1"/>
-        <stop offset="100%" stop-color="${c2}" stop-opacity=".85"/>
-      </radialGradient>
-      <linearGradient id="coreGrad" x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stop-color="${c3}"/>
-        <stop offset="100%" stop-color="${c2}"/>
-      </linearGradient>
-    </defs>
-    <g class="group breathe">
-      ${Array.from({length:6}).map((_,i)=>{
-        const angle = i*60;
-        return `<g transform="translate(100,100) rotate(${angle})">
-          <path d="M0,0 C 8,-40 22,-72 0,-92 C -22,-72 -8,-40 0,0 Z"
-                fill="url(#petalGrad)" opacity=".95"/>
-        </g>`;
-      }).join('')}
-      <circle cx="100" cy="100" r="12" fill="url(#coreGrad)"/>
-      ${Array.from({length:6}).map((_,i)=>{
-        const angle = i*60 + 30;
-        const x = 100 + 18*Math.cos(angle*Math.PI/180);
-        const y = 100 + 18*Math.sin(angle*Math.PI/180);
-        return `<circle cx="${x}" cy="${y}" r="3.2" fill="${c3}" opacity=".9"/>`;
-      }).join('')}
-    </g>
-  </svg>`;
-  lily.addEventListener('animationend', ()=> lily.remove());
-  stage.appendChild(lily);
+  const img = document.createElement('img');
+  img.className = 'lily';
+  img.src = lilyImages[Math.floor(Math.random()*lilyImages.length)];
+
+  // başlangıç parametreleri
+  const scale = Math.random()*0.5 + 0.65;              // 0.65–1.15
+  const baseX = Math.random()*100;                      // vw
+  const startY = 110;                                   // vh
+  const speed = Math.random()*0.015 + 0.010;            // düşüş hızı
+  const amp = Math.random()*8 + 6;                      // salınım genliği (vw)
+  const freq = Math.random()*0.9 + 0.6;                 // salınım frekansı
+  const rotSpeed = (Math.random()*0.2 - 0.1);           // derece/sn
+  const tilt = (Math.random()*8 - 4);                   // başlangıç eğimi
+  const depthBlur = (1 - scale) * 1.2;                  // uzaklık efekti
+
+  let y = startY;
+  let t0 = performance.now()/1000, rot = tilt;
+
+  img.onload = ()=> img.classList.add('ready');
+  img.style.filter = `drop-shadow(0 10px 30px rgba(0,0,0,.5)) blur(${depthBlur}px)`;
+  stage.appendChild(img);
+
+  const item = {el: img, baseX, y, scale, amp, freq, speed, rotSpeed, t0};
+  lilies.add(item);
+
+  function frame(now){
+    if(!document.body.contains(img)){ lilies.delete(item); return; }
+    const t = now/1000 - t0;
+    item.y -= item.speed * 100 * (1/6);              // vh azalt
+    rot += rotSpeed;
+
+    const x = baseX + amp * Math.sin(freq * t + baseX);
+    const yvh = item.y;
+    const transform = `translate(${x}vw, ${yvh}vh) scale(${scale}) rotate(${rot}deg)`;
+    img.style.transform = transform;
+
+    // opacity giriş/çıkış
+    if(yvh < -20){
+      img.style.opacity = '0';
+      img.remove();
+      lilies.delete(item);
+      return;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 }
 
-/* Başlangıç zambakları & periyodik üretim */
-for(let i=0;i<12;i++){ setTimeout(createLily, i*350) }
-setInterval(()=>{ if(document.hidden) return; createLily(); }, 1600);
+/* Başlangıçta ve periyodik üretim */
+for(let i=0;i<10;i++) setTimeout(createRealLily, i*300);
+setInterval(()=>{ if(document.hidden) return; createRealLily(); }, 1500);
 
-/* Minik parıltılar */
-function createSpark(){
-  const s=document.createElement('div');
-  s.className='spark';
-  s.style.left = `${rand(0, 100)}vw`;
-  s.style.bottom = `${rand(-10, 10)}vh`;
-  s.style.animationDuration = `${rand(4,7)}s`;
+/* Ufak parıltılar (opsiyonel) */
+function spark(){
+  const s = document.createElement('div');
+  s.className = 'spark';
+  s.style.left = (Math.random()*100)+'vw';
+  s.style.bottom = (Math.random()*10-5)+'vh';
+  s.style.opacity = 0;
   stage.appendChild(s);
-  s.addEventListener('animationend', ()=> s.remove());
-}
-setInterval(()=>{ if(document.hidden) return; createSpark(); }, 500);
+  const dur = 4000 + Math.random()*3000;
+  const xDrift = 8 + Math.random()*10;
+  const yUp = 30 + Math.random()*20;
+  const t0 = performance.now();
 
-/* ======== Mesaj döngüsü ======== */
+  function f(now){
+    const p = (now - t0)/dur;
+    if(p>=1){ s.remove(); return; }
+    const e = Math.sin(Math.PI * Math.min(p,1)); // ease in-out
+    s.style.transform = `translate(${xDrift*e}vw, ${-yUp*e}vh)`;
+    s.style.opacity = (p<0.1)? p*10 : (p>0.9? (1-p)*10 : 1);
+    requestAnimationFrame(f);
+  }
+  requestAnimationFrame(f);
+}
+setInterval(()=>{ if(document.hidden) return; spark(); }, 600);
+
+/* Döngülü mesajlar */
 const msgEl = document.getElementById('msg');
 const messages = [
   { text: "Her zaman yanında olacağım.", dur: 5000 },
   { text: "Sen bir gün zambakları sevmeyi bırakırsan; işte o gün ben de seni sevmeyi bırakırım.", dur: 8000 }
 ];
-let idx = 0;
+let midx = 0;
 function showMessage(){
-  const m = messages[idx % messages.length];
+  const m = messages[midx % messages.length];
   msgEl.style.setProperty('--msgDur', (m.dur/1000)+'s');
   msgEl.textContent = m.text;
-  msgEl.classList.remove('text'); void msgEl.offsetWidth; msgEl.classList.add('text'); // yeniden tetikle
-  idx++;
-  setTimeout(showMessage, m.dur);
+  msgEl.classList.remove('text'); void msgEl.offsetWidth; msgEl.classList.add('text');
+  midx++; setTimeout(showMessage, m.dur);
 }
 showMessage();
 
-/* ======== Müzik kontrolü (autoplay kısıtlarına uygun) ======== */
+/* Müzik kontrolü */
 const audio = document.getElementById('bgm');
 const btn = document.getElementById('audioBtn');
-let playing = false;
-
-function updateBtn(){
-  btn.classList.toggle('playing', playing);
-  btn.querySelector('span').textContent = playing ? 'müzik açık' : 'müzik kapalı';
-}
-
-async function toggleAudio(){
-  try{
-    if(!playing){ await audio.play(); playing = true; }
-    else{ audio.pause(); playing = false; }
-    updateBtn();
-  }catch(e){
-    // tarayıcı izin vermezse ilk tıkta tekrar deneyeceğiz
-  }
-}
+let playing=false;
+function updateBtn(){ btn.classList.toggle('playing', playing); btn.querySelector('span').textContent = playing?'müzik açık':'müzik kapalı'; }
+async function toggleAudio(){ try{ if(!playing){ await audio.play(); playing=true; } else{ audio.pause(); playing=false; } updateBtn(); }catch(e){} }
 btn.addEventListener('click', toggleAudio);
-
-// ekrana herhangi bir tık ilk kez geldiğinde müziği nazikçe başlat
 let primed=false;
-window.addEventListener('pointerdown', ()=>{
-  for(let i=0;i<3;i++) setTimeout(createLily, i*120);
-  if(!primed){ primed=true; toggleAudio(); }
-});
+window.addEventListener('pointerdown', ()=>{ if(!primed){ primed=true; toggleAudio(); } for(let i=0;i<2;i++) setTimeout(createRealLily, i*120); });
 </script>
 </body>
 </html>
