@@ -17,15 +17,16 @@
     overflow:hidden; -webkit-font-smoothing:antialiased;
   }
 
-  /* arka plan video */
+  /* 🎬 arka plan video */
   .bg{
-    position:fixed; inset:0; width:100%; height:100%;
+    position:fixed; inset:0;
+    width:100%; height:100%;
     object-fit:cover; z-index:-2;
-    filter:brightness(.82) contrast(1.08) saturate(1.02);
+    filter: brightness(1) contrast(1) saturate(1); /* 🔆 karartı tamamen kaldırıldı */
     background:#000;
   }
 
-  /* hafif parıltılar */
+  /* 🌟 hafif parıltılar */
   .spark{
     position:fixed; left:0; top:0; width:4px; height:4px; border-radius:50%;
     background: radial-gradient(circle, #fff, rgba(255,255,255,0) 70%);
@@ -39,7 +40,7 @@
     100% { transform: translate(calc(var(--x) + var(--dx)), -10vh) scale(var(--s)); opacity:0 }
   }
 
-  /* mesajlar */
+  /* 💬 mesajlar */
   .stack{ position:fixed; inset:0; display:grid; place-items:center; pointer-events:none; }
   .msg{
     text-align:center; font-weight:700; line-height:1.28; letter-spacing:.2px;
@@ -55,7 +56,7 @@
     100% {opacity:0; transform: translateY(-10px) scale(.98)}
   }
 
-  /* imza */
+  /* ✍️ imza */
   .credit{
     position:fixed; right:14px; bottom:12px; z-index:3;
     font-size:12.5px; opacity:.9;
@@ -63,10 +64,10 @@
     border:1px solid rgba(255,255,255,.15); backdrop-filter:blur(6px);
   }
 
-  /* tek tık kapağı */
+  /* 👆 tek tık kapağı */
   .overlay{
     position:fixed; inset:0; display:grid; place-items:center; z-index:5;
-    background:linear-gradient(180deg, rgba(0,0,0,.30), rgba(0,0,0,.30));
+    background:rgba(0,0,0,0); /* tamamen şeffaf, artık karartı yok */
   }
   .tap{
     font-weight:700; font-size: clamp(18px, 2.6vw, 28px);
@@ -77,7 +78,7 @@
   }
   .tap:active{ transform:scale(.98) }
 
-  /* responsive metin */
+  /* 📱 responsive metin */
   @media (max-width:480px){  .msg{ font-size:20px } }
   @media (min-width:481px) and (max-width:820px){ .msg{ font-size:26px } }
   @media (min-width:821px){ .msg{ font-size:34px } }
@@ -85,28 +86,28 @@
 </head>
 <body>
 
-  <!-- video -->
+  <!-- 🎥 video -->
   <video class="bg" id="bgVideo" playsinline autoplay muted loop>
     <source src="zambak.mp4" type="video/mp4">
   </video>
 
-  <!-- müzik -->
+  <!-- 🎵 müzik -->
   <audio id="bgm" src="m%C3%BCzik.mp3" loop preload="auto"></audio>
 
-  <!-- parıltılar -->
+  <!-- 🌠 parıltılar -->
   <div id="sparkLayer"></div>
 
-  <!-- mesaj alanı -->
+  <!-- 💬 mesaj alanı -->
   <div class="stack"><div id="msg" class="msg"></div></div>
 
-  <!-- imza -->
+  <!-- ✍️ imza -->
   <div class="credit">emrullahaydogdu design</div>
 
-  <!-- tek tıkla başlat -->
+  <!-- 👆 tek tıkla başlat -->
   <div class="overlay" id="overlay"><div class="tap" id="tapBtn">Buraya tıkla</div></div>
 
 <script>
-/* ====== hafif ışıltılar ====== */
+/* 🌟 parıltılar */
 const sparkLayer = document.getElementById('sparkLayer');
 function spawnSpark(){
   const s = document.createElement('div');
@@ -120,7 +121,7 @@ function spawnSpark(){
 }
 setInterval(()=>{ if(!document.hidden) spawnSpark(); }, 900);
 
-/* ====== mesaj döngüsü ====== */
+/* 💬 mesaj döngüsü */
 const msg = document.getElementById('msg');
 const messages = [
   { text: "Her zaman yanında olacağım.", dur: 5000 },
@@ -139,7 +140,7 @@ function rotateMessages(){
   idx++; setTimeout(rotateMessages, m.dur);
 }
 
-/* ====== tek tıkla başlat + müzik 17. saniyeden ====== */
+/* 🎧 tek tıkla başlat + müzik 17. saniyeden */
 const audio = document.getElementById('bgm');
 const overlay = document.getElementById('overlay');
 const tapBtn  = document.getElementById('tapBtn');
