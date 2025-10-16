@@ -120,7 +120,7 @@ function spawnSpark(){
 }
 setInterval(()=>{ if(!document.hidden) spawnSpark(); }, 900);
 
-/* ====== mesaj döngüsü (doğal, özgün metinlerle) ====== */
+/* ====== mesaj döngüsü ====== */
 const msg = document.getElementById('msg');
 const messages = [
   { text: "Her zaman yanında olacağım.", dur: 5000 },
@@ -139,7 +139,7 @@ function rotateMessages(){
   idx++; setTimeout(rotateMessages, m.dur);
 }
 
-/* ====== tek tıkla başlat ====== */
+/* ====== tek tıkla başlat + müzik 10. saniyeden ====== */
 const audio = document.getElementById('bgm');
 const overlay = document.getElementById('overlay');
 const tapBtn  = document.getElementById('tapBtn');
@@ -147,7 +147,15 @@ const tapBtn  = document.getElementById('tapBtn');
 async function startAll(){
   overlay.style.display = 'none';
   if(!loopStarted){ loopStarted = true; rotateMessages(); }
-  try{ await audio.play(); }catch(_){}
+
+  try {
+    audio.currentTime = 10;           // 🎵 müzik 10. saniyeden başlasın
+    await audio.play();
+    // bazı tarayıcılar hemen atlamaz, 300ms sonra tekrar zorluyoruz
+    setTimeout(() => { 
+      try { audio.currentTime = 10; } catch(e){} 
+    }, 300);
+  } catch(_){}
 }
 tapBtn.addEventListener('click', startAll);
 window.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') startAll(); });
