@@ -7,6 +7,8 @@
 <style>
   :root{
     --bg: radial-gradient(1200px 800px at 70% 10%, #1a1b2e 0%, #0e0f1a 50%, #0b0c14 100%);
+    --textGlow: 0 6px 28px rgba(255,220,250,.35);
+    --accent: #ffd1e8;
   }
   html,body{height:100%;margin:0}
   body{
@@ -15,14 +17,18 @@
     overflow:hidden;
     color:#e8ecff;
   }
+
+  /* Üst mini panel */
   header{
-    position:fixed; inset: 20px auto auto 20px; z-index:3;
+    position:fixed; inset: 14px auto auto 14px; z-index:4;
     padding:10px 14px; border-radius:14px; backdrop-filter: blur(8px);
     background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
     box-shadow: 0 10px 30px rgba(0,0,0,.35);
   }
   header h1{font-size:18px; margin:0 0 4px}
   header p{margin:0; font-size:13px; opacity:.85}
+
+  /* Sahne */
   .stage{position:relative; width:100%; height:100%;}
   .lily{
     position:absolute; width:160px; height:160px; transform-origin:center;
@@ -30,11 +36,10 @@
     animation: floatY var(--dur) linear forwards;
     opacity:0;
   }
-  .glow{
-    filter: url(#glow);
-  }
+  .glow{ filter:url(#glow) }
   .breathe{ animation: breathe 6s ease-in-out infinite; transform-origin:center }
   .lily:hover .group{ animation: wobble .9s ease-in-out infinite alternate; }
+
   @keyframes floatY{
     0%   { transform: translate(var(--x), 110vh) scale(var(--scale)) rotate(0deg); opacity:0}
     6%   { opacity:.95 }
@@ -45,50 +50,124 @@
     0%,100%{ transform: scale(1)}
     50%{ transform: scale(1.05)}
   }
-  @keyframes wobble{
-    from{ transform: rotate(-2deg) }
-    to  { transform: rotate(2deg) }
-  }
+  @keyframes wobble{ from{transform:rotate(-2deg)} to{transform:rotate(2deg)} }
+
+  /* Altta ışık */
   .floor{
     position:fixed; left:0; right:0; bottom:-40px; height:160px; z-index:0;
     background: radial-gradient(60% 100% at 50% 0%, rgba(99,132,255,.17), rgba(0,0,0,0) 70%);
     pointer-events:none;
   }
-  .credits{
-    position:fixed; right:16px; bottom:12px; font-size:12px; opacity:.65
+
+  /* Ortadaki mesajlar */
+  .message{
+    position:fixed; inset:0; display:grid; place-items:center; z-index:3; pointer-events:none;
   }
-  a{color:#a7b8ff; text-decoration:none}
-  a:hover{text-decoration:underline}
+  .message .text{
+    font-weight:700;
+    text-align:center;
+    line-height:1.25;
+    letter-spacing:.3px;
+    text-shadow: var(--textGlow);
+    max-width:min(90vw, 900px);
+    padding:0 18px;
+    opacity:0;
+    transform: translateY(6px) scale(.98);
+    animation: fadeMsg var(--msgDur,6s) ease-in-out forwards;
+  }
+  @keyframes fadeMsg{
+    0%   {opacity:0; transform: translateY(8px) scale(.98)}
+    10%  {opacity:1; transform: translateY(0)   scale(1)}
+    90%  {opacity:1; transform: translateY(0)   scale(1)}
+    100% {opacity:0; transform: translateY(-8px) scale(.98)}
+  }
+
+  /* Alt sağ imza */
+  .credit{
+    position:fixed; right:16px; bottom:14px; z-index:4;
+    font-size:12.5px; letter-spacing:.6px; opacity:.8;
+    background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+    padding:6px 10px; border-radius:10px; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  /* Müzik butonu */
+  .audio-toggle{
+    position:fixed; right:16px; top:16px; z-index:5;
+    background: rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);
+    padding:10px 12px; border-radius:12px; cursor:pointer;
+    user-select:none; -webkit-user-select:none;
+    display:flex; gap:8px; align-items:center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .audio-toggle span{font-size:13px; opacity:.85}
+  .audio-dot{ width:8px; height:8px; border-radius:999px; background:#f87171;}
+  .audio-toggle.playing .audio-dot{ background:#34d399 }
+
+  /* Ekstra: minik parıltılar */
+  .spark{
+    position:absolute; width:4px; height:4px; border-radius:50%;
+    background: radial-gradient(circle, #fff, rgba(255,255,255,0) 70%);
+    opacity:0; pointer-events:none; z-index:2;
+    animation: sparkFloat 5s linear forwards;
+    filter: blur(.2px);
+  }
+  @keyframes sparkFloat{
+    0%{ transform: translateY(20vh) translateX(0); opacity:0 }
+    10%{ opacity:.8 }
+    90%{ opacity:.8 }
+    100%{ transform: translateY(-25vh) translateX(12vw); opacity:0 }
+  }
+
+  /* Responsive metin boyutu */
+  @media (max-width: 720px){
+    .message .text{ font-size: 22px }
+    header{ display:none }
+  }
+  @media (min-width: 721px){
+    .message .text{ font-size: 34px }
+  }
 </style>
 </head>
 <body>
+  <div class="audio-toggle" id="audioBtn" title="Müzik Aç/Kapat">
+    <div class="audio-dot"></div><span>müzik</span>
+  </div>
+
   <header>
     <h1>🌸 Zambak Bahçesi</h1>
-    <p>Ekrana tıklarsan daha fazla zambak açar.</p>
+    <p>Ekrana tıkla: daha çok zambak ve müzik başlar.</p>
   </header>
 
   <div class="stage" id="stage" aria-label="Zambak animasyonu"></div>
   <div class="floor"></div>
-  <div class="credits">made with ♥ — <a href="https://github.com/" target="_blank" rel="noreferrer">GitHub Pages</a></div>
+
+  <!-- Döngülü mesaj katmanı -->
+  <div class="message"><div id="msg" class="text"></div></div>
+
+  <!-- Alt sağ imza -->
+  <div class="credit">emrullahaydogdu design</div>
+
+  <!-- Müzik (kendi mp3’ünü repo köküne music.mp3 adıyla yükle) -->
+  <audio id="bgm" src="music.mp3" loop preload="auto"></audio>
 
 <script>
+/* ======== Animasyon renkleri ve yardımcılar ======== */
 const stage = document.getElementById('stage');
-
 const palettes = [
   ['#ffd1e8','#ff9ad5','#f770b6','#b858ff'],
   ['#b8f1ff','#7dd3fc','#60a5fa','#a78bfa'],
   ['#fef9c3','#fde68a','#fca5a5','#f472b6'],
   ['#c7f9cc','#80ed99','#57cc99','#38a3a5']
 ];
+const rand=(a,b)=>Math.random()*(b-a)+a;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
 
-function rand(min,max){ return Math.random()*(max-min)+min }
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
-
+/* ======== Zambak (SVG) üretimi ======== */
 function createLily(){
   const lily = document.createElement('div');
   lily.className = 'lily';
-  const scale = rand(.6, 1.2).toFixed(2);
-  lily.style.setProperty('--scale', scale);
+  lily.style.setProperty('--scale', rand(.6, 1.2).toFixed(2));
   lily.style.setProperty('--x', `${rand(-10, 95).toFixed(2)}vw`);
   lily.style.setProperty('--drift', `${rand(-12,12).toFixed(2)}vw`);
   lily.style.setProperty('--dur', `${rand(18, 32).toFixed(2)}s`);
@@ -133,10 +212,65 @@ function createLily(){
   stage.appendChild(lily);
 }
 
+/* Başlangıç zambakları & periyodik üretim */
 for(let i=0;i<12;i++){ setTimeout(createLily, i*350) }
 setInterval(()=>{ if(document.hidden) return; createLily(); }, 1600);
+
+/* Minik parıltılar */
+function createSpark(){
+  const s=document.createElement('div');
+  s.className='spark';
+  s.style.left = `${rand(0, 100)}vw`;
+  s.style.bottom = `${rand(-10, 10)}vh`;
+  s.style.animationDuration = `${rand(4,7)}s`;
+  stage.appendChild(s);
+  s.addEventListener('animationend', ()=> s.remove());
+}
+setInterval(()=>{ if(document.hidden) return; createSpark(); }, 500);
+
+/* ======== Mesaj döngüsü ======== */
+const msgEl = document.getElementById('msg');
+const messages = [
+  { text: "Her zaman yanında olacağım.", dur: 5000 },
+  { text: "Sen bir gün zambakları sevmeyi bırakırsan; işte o gün ben de seni sevmeyi bırakırım.", dur: 8000 }
+];
+let idx = 0;
+function showMessage(){
+  const m = messages[idx % messages.length];
+  msgEl.style.setProperty('--msgDur', (m.dur/1000)+'s');
+  msgEl.textContent = m.text;
+  msgEl.classList.remove('text'); void msgEl.offsetWidth; msgEl.classList.add('text'); // yeniden tetikle
+  idx++;
+  setTimeout(showMessage, m.dur);
+}
+showMessage();
+
+/* ======== Müzik kontrolü (autoplay kısıtlarına uygun) ======== */
+const audio = document.getElementById('bgm');
+const btn = document.getElementById('audioBtn');
+let playing = false;
+
+function updateBtn(){
+  btn.classList.toggle('playing', playing);
+  btn.querySelector('span').textContent = playing ? 'müzik açık' : 'müzik kapalı';
+}
+
+async function toggleAudio(){
+  try{
+    if(!playing){ await audio.play(); playing = true; }
+    else{ audio.pause(); playing = false; }
+    updateBtn();
+  }catch(e){
+    // tarayıcı izin vermezse ilk tıkta tekrar deneyeceğiz
+  }
+}
+btn.addEventListener('click', toggleAudio);
+
+// ekrana herhangi bir tık ilk kez geldiğinde müziği nazikçe başlat
+let primed=false;
 window.addEventListener('pointerdown', ()=>{
   for(let i=0;i<3;i++) setTimeout(createLily, i*120);
+  if(!primed){ primed=true; toggleAudio(); }
 });
 </script>
 </body>
